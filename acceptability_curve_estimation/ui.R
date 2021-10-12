@@ -19,20 +19,26 @@ shinyUI(fluidPage(
     sidebarLayout(
         sidebarPanel(
           
-          radioButtons("Ntrials", "Number of ACE to create",
-                       choices = c(1, 2, 3), selected = 1),
-          
-     
-        numericInput("point_est", "Point estimate", value = 0),
-        numericInput("std_err", "Standard Error", value = 1),
-        numericInput("df", "Degrees of freedom", value = 10000)
-
+            numericInput("point_est1", "Trial 1: Point estimate", value = 0),
+            numericInput("std_err1", "Trial 1: Standard Error", value = 1),
+            numericInput("df1", "Trial 1: Degrees of freedom (optional)", value = NA), 
+            
+            numericInput("point_est2", "Trial 2: Point estimate", value = NA),
+            numericInput("std_err2", "Trial 2: Standard Error", value = NA),
+            numericInput("df2", "Trial 2: Degrees of freedom (optional)", value = NA), 
+            
+            numericInput("point_est3", "Trial 3: Point estimate", value = NA),
+            numericInput("std_err3", "Trial 3: Standard Error", value = NA),
+            numericInput("df3", "Trial 3: Degrees of freedom (optional)", value = NA), 
+            
+            numericInput("comp_val", "Comparison threshold value", value = NA)
         
         ),
         
         # Show a plot of the generated distribution
         mainPanel(
-            plotOutput("acceptability_curve")
+            plotOutput("acceptability_curve"),
+            tableOutput("acceptability_values")
         )
     )
 ))
