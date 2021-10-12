@@ -19,45 +19,46 @@ theme_update(panel.grid.major = element_blank(),
 
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
+    
+    # values 1
+    point_est1 <- reactive(input$point_est1)
+    std_err1 <-  reactive(input$std_err1)
+    df1 <-  reactive(ifelse(!is.na(input$df1), input$df1, 1000000))
+    
+    # values 2
+    point_est2 <-  reactive(ifelse(!is.na(input$point_est2) & !is.na(input$std_err2), input$point_est2, NA))
+    std_err2 <-  reactive(ifelse(!is.na(input$point_est2) & !is.na(input$std_err2), input$std_err2, NA))
+    df2 <-  reactive(ifelse(!is.na(input$point_est2) & !is.na(input$std_err2) & !is.na(input$df2), input$df2, 1000000))
+    
+    # values 3
+    point_est3 <-  reactive(ifelse(!is.na(input$point_est3) & !is.na(input$std_err3), input$point_est3, NA))
+    std_err3 <-  reactive(ifelse(!is.na(input$point_est3) & !is.na(input$std_err3), input$std_err3, NA))
+    df3 <-  reactive(ifelse(!is.na(input$point_est3) & !is.na(input$std_err3) & !is.na(input$df3), input$df3, 1000000))
+
 
     
     output$acceptability_curve <- renderPlot({
         
-        # values 1
-        point_est1 <- input$point_est1
-        std_err1 <- input$std_err1
-        df1 <- ifelse(!is.na(input$df1), input$df1, 1000000)
-        
-        # values 2
-        point_est2 <- ifelse(!is.na(input$point_est2) & !is.na(input$std_err2), input$point_est2, NA)
-        std_err2 <- ifelse(!is.na(input$point_est2) & !is.na(input$std_err2), input$std_err2, NA)
-        df2 <- ifelse(!is.na(input$point_est2) & !is.na(input$std_err2) & !is.na(input$df2), input$df2, 1000000)
-        
-        # values 3
-        point_est3 <- ifelse(!is.na(input$point_est3) & !is.na(input$std_err3), input$point_est3, NA)
-        std_err3 <- ifelse(!is.na(input$point_est3) & !is.na(input$std_err3), input$std_err3, NA)
-        df3 <- ifelse(!is.na(input$point_est3) & !is.na(input$std_err3) & !is.na(input$df3), input$df3, 1000000)
-        
         # get estimates
         mutiplier <- 3.5
-        lower <- min(point_est1 - mutiplier*std_err1, 
-                     point_est2 - mutiplier*std_err2, 
-                     point_est3 - mutiplier*std_err3, 
+        lower <- min(point_est1() - mutiplier*std_err1(), 
+                     point_est2() - mutiplier*std_err2(), 
+                     point_est3() - mutiplier*std_err3(), 
                      input$comp_val,
                      na.rm = T)
                      
-        upper <- max(point_est1 + mutiplier*std_err1, 
-                     point_est2 + mutiplier*std_err2, 
-                     point_est3 + mutiplier*std_err3, 
+        upper <- max(point_est1() + mutiplier*std_err1(), 
+                     point_est2() + mutiplier*std_err2(), 
+                     point_est3() + mutiplier*std_err3(), 
                      input$comp_val,
                      na.rm = T)
         
         params <- tibble(
-            est = c("ACE 1", "ACE 2", "ACE 3"),
-            point_est = c(point_est1, point_est2, point_est3), 
-            std_err = c(std_err1, std_err2, std_err3), 
-            df = c(df1, df2, df3)
+            est = c("Trial 1", "Trial 2", "Trial 3"),
+            point_est = c(point_est1(), point_est2(), point_est3()), 
+            std_err = c(std_err1(), std_err2(), std_err3()), 
+            df = c(df1(), df2(), df3())
         ) %>% 
             drop_na()
         
@@ -77,7 +78,7 @@ shinyServer(function(input, output) {
             scale_linetype_manual(values = c("solid", "longdash", "dotted")) +
             scale_y_continuous(labels = percent_format(accuracy = 1)) +
             theme(legend.position = "bottom", legend.title = element_blank()) +
-            labs(x = "Acceptability threshold", y = "ACE value")
+            labs(x = "Acceptability threshold", y = "Acceptability value")
         
 
         # add on vertical line
@@ -93,35 +94,21 @@ shinyServer(function(input, output) {
     
     output$acceptability_values <-renderTable({
         
-        # values 1
-        point_est1 <- input$point_est1
-        std_err1 <- input$std_err1
-        df1 <- ifelse(!is.na(input$df1), input$df1, 1000000)
-        
-        # values 2
-        point_est2 <- ifelse(!is.na(input$point_est2) & !is.na(input$std_err2), input$point_est2, NA)
-        std_err2 <- ifelse(!is.na(input$point_est2) & !is.na(input$std_err2), input$std_err2, NA)
-        df2 <- ifelse(!is.na(input$point_est2) & !is.na(input$std_err2) & !is.na(input$df2), input$df2, 1000000)
-        
-        # values 3
-        point_est3 <- ifelse(!is.na(input$point_est3) & !is.na(input$std_err3), input$point_est3, NA)
-        std_err3 <- ifelse(!is.na(input$point_est3) & !is.na(input$std_err3), input$std_err3, NA)
-        df3 <- ifelse(!is.na(input$point_est3) & !is.na(input$std_err3) & !is.na(input$df3), input$df3, 1000000)
         
         params <- tibble(
             trial = c("Trial 1", "Trial 2", "Trial 3"),
             threshold = rep(input$comp_val, 3),
-            point_est = c(point_est1, point_est2, point_est3), 
-            std_err = c(std_err1, std_err2, std_err3), 
-            df = c(df1, df2, df3)
+            point_est = c(point_est1(), point_est2(), point_est3()), 
+            std_err = c(std_err1(), std_err2(), std_err3()), 
+            df = c(df1(), df2(), df3())
         ) %>% 
             # get rid of any rows with missing values
             drop_na()
         
         data <- params %>% 
             mutate(crit_val = (point_est - threshold)/ std_err,
-                   `ACE value` = pt(crit_val, df)) %>% 
-            select(trial, threshold, `ACE value`)
+                   `Acceptability value` = paste0(round(pt(crit_val, df)*100, 1), "%")) %>% 
+            select(Trial = trial, Threshold = threshold, `Acceptability value`)
         
         if(!is.na(input$comp_val)){
             data
