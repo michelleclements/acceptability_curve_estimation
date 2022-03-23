@@ -32,9 +32,9 @@ Point estimates and variance mesures can be from frequentist or Bayesian analysi
 
 ## Replicating results from ACE paper  
 
-Use the values below to replicate the results from 'Improving clinical trial interpretation with Acceptability Curve Estimation (ACE)', 
+Use the values below to replicate the results from 'Improving clinical trial interpretation with Acceptability Curve Estimation (ACE)' (pdf available from https://arxiv.org/ftp/arxiv/papers/2203/2203.11164.pdf).
 
-Note that these values are from the Frequentist analysis in the original papers and so differ very slightly from the paper, which used Bayesian analysis. Results don't differ appreciably when degrees of freedom are inputted so I haven't included below. 
+Note that these values are from the Frequentist analysis in the original papers and so differ very slightly from the reanalysis, which used Bayesian methods. Results don't differ appreciably when degrees of freedom are inputted so I haven't included below. 
 
 
 
